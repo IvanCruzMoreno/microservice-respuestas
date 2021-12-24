@@ -1,6 +1,7 @@
 package com.ivanmoreno.respuestas.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,12 @@ public class RespuestaController {
 	
 	@PostMapping
 	public ResponseEntity<?> create(@RequestBody List<Respuesta> respuestas) {
+		respuestas = respuestas.stream()
+				.map(respuesta -> {
+					respuesta.setAlumnoId(respuesta.getAlumno().getId());
+					return respuesta;
+				}).collect(Collectors.toList());
+		
 		List<Respuesta> respuestasSaved = (List<Respuesta>) service.saveAll(respuestas);
 		return ResponseEntity.status(HttpStatus.CREATED).body(respuestasSaved);
 	}
