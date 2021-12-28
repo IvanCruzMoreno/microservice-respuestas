@@ -12,6 +12,9 @@ public interface RespuestaRepository extends MongoRepository<Respuesta, String> 
 	@Query("{'alumnoId': ?0, 'preguntaId': { $in: ?1 } }")
 	public List<Respuesta> findRespuestasByAlumnoIdByPreguntasId(Long alumnoId, List<Long> examenId);
 	
+	@Query("{'alumnoId' : ?0 }")
+	public List<Respuesta> findByAlumnoId(Long alumnoId);
+	
 //	@Query("select r from Respuesta r join fetch r.pregunta p join fetch p.examen e where r.alumnoId=?1 and e.id=?2")
 //	public List<Respuesta> findRespuestasByAlumnoByExamen(Long alumnoId, Long examenId);
 //	

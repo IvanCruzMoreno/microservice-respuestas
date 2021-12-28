@@ -1,5 +1,6 @@
 package com.ivanmoreno.respuestas.services;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,7 +59,24 @@ public class RespuestaServiceImpl implements RespuestaService {
 	
 	@Override
 	public List<Long> findExamenesIdsByAlumno(Long alumnoId) {
-		return null;
+		List<Respuesta> respuestasByAlumno = respuestaRepo.findByAlumnoId(alumnoId);
+		List<Long> examenesIds = Collections.emptyList();
+		
+		if(respuestasByAlumno != null && respuestasByAlumno.size() > 0) {
+			
+			List<Long> preguntasIds = respuestasByAlumno.stream()
+					.map(Respuesta::getPreguntaId)
+					.collect(Collectors.toList());
+			
+			examenesIds = examenFeignClient.getExamenesIdsByPreguntasId(preguntasIds);
+		}
+		
+		return examenesIds;
+	}
+
+	@Override
+	public List<Respuesta> findByAlumnoId(Long alumnoId) {
+		return this.respuestaRepo.findByAlumnoId(alumnoId);
 	}
 
 }

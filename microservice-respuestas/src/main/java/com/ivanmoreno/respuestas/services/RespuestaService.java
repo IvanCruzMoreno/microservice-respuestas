@@ -11,4 +11,6 @@ public interface RespuestaService {
 	public List<Respuesta> findRespuestasByAlumnoByExamen(Long alumnoId, Long examenId);
 	
 	public List<Long> findExamenesIdsByAlumno(Long alumnoId);
+	
+	public List<Respuesta> findByAlumnoId(Long alumnoId);
 }
