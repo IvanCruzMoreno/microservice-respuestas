@@ -1,12 +1,14 @@
 package com.ivanmoreno.respuestas;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
-@EntityScan({"com.ivanmoreno.commons.models.entity",
-		     "com.ivanmoreno.respuestas.models.entity"})
+@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
+@EnableFeignClients
 @EnableEurekaClient
 @SpringBootApplication
 public class MicroserviceRespuestasApplication {

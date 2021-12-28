@@ -26,6 +26,7 @@ public class RespuestaController {
 		respuestas = respuestas.stream()
 				.map(respuesta -> {
 					respuesta.setAlumnoId(respuesta.getAlumno().getId());
+					respuesta.setPreguntaId(respuesta.getPregunta().getId());
 					return respuesta;
 				}).collect(Collectors.toList());
 		

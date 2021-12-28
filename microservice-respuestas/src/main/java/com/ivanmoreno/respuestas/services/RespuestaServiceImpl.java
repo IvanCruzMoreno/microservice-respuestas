@@ -1,10 +1,13 @@
 package com.ivanmoreno.respuestas.services;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import com.ivanmoreno.commons.models.entity.Examen;
+import com.ivanmoreno.commons.models.entity.Pregunta;
+import com.ivanmoreno.respuestas.clients.ExamenClientFeign;
 import com.ivanmoreno.respuestas.models.entity.Respuesta;
 import com.ivanmoreno.respuestas.models.respository.RespuestaRepository;
 
@@ -12,27 +15,50 @@ import com.ivanmoreno.respuestas.models.respository.RespuestaRepository;
 public class RespuestaServiceImpl implements RespuestaService {
 
 	private RespuestaRepository respuestaRepo;
+	private ExamenClientFeign examenFeignClient;
 	
-	public RespuestaServiceImpl(RespuestaRepository repository) {
+	public RespuestaServiceImpl(RespuestaRepository repository, ExamenClientFeign examenFeign) {
 		this.respuestaRepo = repository;
+		this.examenFeignClient = examenFeign;
 	}
 	
 	@Override
-	@Transactional
 	public Iterable<Respuesta> saveAll(Iterable<Respuesta> respuestas) {
 		return respuestaRepo.saveAll(respuestas);
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	public List<Respuesta> findRespuestasByAlumnoByExamen(Long alumnoId, Long examenId) {
-		return respuestaRepo.findRespuestasByAlumnoByExamen(alumnoId, examenId);
+		
+		Examen examen = examenFeignClient.getExamenById(examenId);
+		List<Pregunta> preguntas = examen.getPreguntas();
+		List<Long> preguntasId = preguntas
+				.stream()
+				.map(Pregunta::getId)
+				.collect(Collectors.toList());
+		
+		List<Respuesta> respuestas = respuestaRepo.findRespuestasByAlumnoIdByPreguntasId(alumnoId, preguntasId)
+				.stream()
+				.map(repuesta -> this.setFullPregunta(repuesta, preguntas))
+				.collect(Collectors.toList());
+		
+		return respuestas;
 	}
 
+	private Respuesta setFullPregunta(Respuesta respuesta, List<Pregunta> preguntas) {
+		
+		preguntas.forEach(pregunta -> {
+			if(pregunta.getId() == respuesta.getPreguntaId()) {
+				respuesta.setPregunta(pregunta);
+			}
+		});
+		
+		return respuesta;
+	}
+	
 	@Override
-	@Transactional(readOnly = true)
 	public List<Long> findExamenesIdsByAlumno(Long alumnoId) {
-		return respuestaRepo.findExamenesIdsByAlumno(alumnoId);
+		return null;
 	}
 
 }
